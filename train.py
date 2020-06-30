@@ -48,7 +48,6 @@ def train(model: nn.Module,
                 count = 0
                 print('Validation:')
                 for val_batch in dataset_reader.get_batches(data_dir, 'dev', batch_size):
-                    print(count)
                     val_batch_input = torch.tensor(val_batch[:, :-1])
                     val_batch_labels = torch.tensor(val_batch[:, 1:])
                     val_logits = model(val_batch_input)
@@ -82,5 +81,5 @@ if __name__=='__main__':
     vocab = dataset_reader.get_vocab(data_dir + '/vocab.txt')
     dataset_reader.write_vocab(savePath + '/vocab.txt', vocab=vocab)
 
-    with open(config['savePath'] + '/config.yaml', 'w') as f:
+    with open(savePath + '/config.yaml', 'w') as f:
         yaml.dump(config, f)

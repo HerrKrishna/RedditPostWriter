@@ -11,9 +11,6 @@ class Model(nn.Module):
 
         super(Model, self).__init__()
 
-        print(vocab_size)
-        print(hidden_size)
-        print(dropout)
         self.embed = nn.Embedding(vocab_size, hidden_size)
         self.lstm = nn.LSTM(input_size=hidden_size,
                             hidden_size=hidden_size,
