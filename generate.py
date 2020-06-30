@@ -35,18 +35,16 @@ if __name__=='__main__':
     print('Welcome to RedditPostWriter')
     print('####################################')
     print('\n\n')
-    config_path = sys.argv[1]
-    with open(config_path) as config_file:
+    model_path = sys.argv[1]
+    with open(model_path + '/config.yaml' ) as config_file:
         config = yaml.load(config_file, Loader=yaml.FullLoader)
     input_text = sys.argv[2]
-    data_dir = config['storage']['data_dir']
-    savePath = config['storage']['savePath']
-    vocab_size = get_vocab_size(data_dir)
+    vocab_size = get_vocab_size(model_path)
     model = Model(vocab_size=vocab_size, **config['model'])
     print('Your input was: ' + input_text)
     print('\n')
     model = Model()
-    vocab = get_vocab(savePath + '/vocab.txt')
+    vocab = get_vocab(model_path + '/vocab.txt')
     output_text = generate(model=model, vocab=vocab, input_text=input_text)
     print('Output: ')
     print(output_text)
