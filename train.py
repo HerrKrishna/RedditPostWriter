@@ -18,7 +18,8 @@ def train(model: nn.Module,
           batch_size: int = 10,
           num_epochs: int = 10,
           val_freq: int = 100,
-          summary_freq: int = 10):
+          summary_freq: int = 10,
+          max_len: int = 1500):
 
     model.apply(init_weights)
     model.train()
@@ -26,7 +27,7 @@ def train(model: nn.Module,
     optimizer = torch.optim.SGD(model.parameters(), lr=learning_rate)
     batch_no = 0
     for epoch in range(num_epochs):
-        for batch in dataset_reader.get_batches(data_dir, 'train', batch_size):
+        for batch in dataset_reader.get_batches(data_dir, 'train', batch_size, max_len):
             batch_input = torch.tensor(batch[:, :-1])
             batch_labels = torch.tensor(batch[:, 1:])
             logits = model(batch_input)
@@ -47,7 +48,7 @@ def train(model: nn.Module,
                 total_val_loss = 0
                 count = 0
                 print('Validation:')
-                for val_batch in dataset_reader.get_batches(data_dir, 'dev', batch_size):
+                for val_batch in dataset_reader.get_batches(data_dir, 'dev', batch_size, max_len):
                     val_batch_input = torch.tensor(val_batch[:, :-1])
                     val_batch_labels = torch.tensor(val_batch[:, 1:])
                     val_logits = model(val_batch_input)

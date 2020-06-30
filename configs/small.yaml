@@ -13,3 +13,4 @@ training:
   summary_freq: 10
   batch_size: 10
   num_epochs: 1
+  max_len: 1500
