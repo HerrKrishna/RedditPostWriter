@@ -1,10 +1,11 @@
 import torch
+import sys
+import yaml
 from torch import nn
 from torch.nn import functional as F
-import sys
 from model import Model
 from preprocessing.convertTextIds import text2id, id2text
-from dataset_reader import get_vocab
+from dataset_reader import get_vocab_size, get_vocab
 
 
 def generate(model: nn.Module, vocab: list, input_text: str = '',):
@@ -34,12 +35,18 @@ if __name__=='__main__':
     print('Welcome to RedditPostWriter')
     print('####################################')
     print('\n\n')
-    hyperparams = sys.argv[1]
+    config_path = sys.argv[1]
+    with open(config_path) as config_file:
+        config = yaml.load(config_file, Loader=yaml.FullLoader)
     input_text = sys.argv[2]
-    vocab = get_vocab(vocab_path)
+    data_dir = config['storage']['data_dir']
+    savePath = config['storage']['savePath']
+    vocab_size = get_vocab_size(data_dir)
+    model = Model(vocab_size=vocab_size, **config['model'])
     print('Your input was: ' + input_text)
     print('\n')
-    model = Model(**hyperparams)
+    model = Model()
+    vocab = get_vocab(savePath + '/vocab.txt')
     output_text = generate(model=model, vocab=vocab, input_text=input_text)
     print('Output: ')
     print(output_text)
