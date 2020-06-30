@@ -4,8 +4,9 @@ import random
 
 if __name__=='__main__':
 
-    output_filename = sys.argv[1]
-    corpus = Corpus(filename=download("reddit-corpus-small"))
+    corpus_name = sys.argv[1]
+    output_filename = sys.argv[2]
+    corpus = Corpus(filename=download(corpus_name))
 
     char_list = ['<sos>', '<eos>', '<pad>', '<unk>']
     sequences = []
