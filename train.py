@@ -1,5 +1,6 @@
 import torch
 import sys
+import yaml
 from torch import nn
 import dataset_reader
 from model import Model
@@ -12,7 +13,7 @@ def init_weights(m):
 
 
 def train(model: nn.Module,
-          data_directory: str,
+          data_dir: str,
           learning_rate: float,
           batch_size: int = 10,
           num_epochs: int = 10,
@@ -25,7 +26,7 @@ def train(model: nn.Module,
     optimizer = torch.optim.SGD(model.parameters(), lr=learning_rate)
     batch_no = 0
     for epoch in range(num_epochs):
-        for batch in dataset_reader.get_batches(data_directory, 'train', batch_size):
+        for batch in dataset_reader.get_batches(data_dir, 'train', batch_size):
             batch_input = torch.tensor(batch[:, :-1])
             batch_labels = torch.tensor(batch[:, 1:])
             logits = model(batch_input)
@@ -46,7 +47,7 @@ def train(model: nn.Module,
                 total_val_loss = 0
                 count = 0
                 print('Validation:')
-                for val_batch in dataset_reader.get_batches(data_directory, 'dev', batch_size):
+                for val_batch in dataset_reader.get_batches(data_dir, 'dev', batch_size):
                     print(count)
                     val_batch_input = torch.tensor(val_batch[:, :-1])
                     val_batch_labels = torch.tensor(val_batch[:, 1:])
@@ -65,16 +66,21 @@ def train(model: nn.Module,
             batch_no += 1
 
 
-
-
-
-
 if __name__=='__main__':
 
-    data_directory = sys.argv[1]
-    vocab_size = dataset_reader.get_vocab_size(data_directory)
-    model = Model(vocab_size=vocab_size,
-                  hidden_size=300,
-                  dropout=0.1)
+    config_path = sys.argv[1]
+    with open(config_path) as config_file:
+        config = yaml.load(config_file, Loader=yaml.FullLoader)
 
-    train(model=model, data_directory=data_directory, learning_rate=0.1, val_freq=10)
+    data_dir = config['storage']['data_dir']
+    savePath = config['storage']['savePath']
+    vocab_size = dataset_reader.get_vocab_size(data_dir)
+    model = Model(vocab_size=vocab_size, **config['model'])
+    train(model=model, **config['training'])
+
+    torch.save(model.state_dict(), savePath + '/model_state_dict')
+    vocab = dataset_reader.get_vocab(data_dir + '/vocab.txt')
+    dataset_reader.write_vocab(savePath + '/vocab.txt', vocab=vocab)
+
+    with open(config['savePath'] + '/config.yaml', 'w') as f:
+        yaml.dump(config, f)

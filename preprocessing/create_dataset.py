@@ -7,7 +7,7 @@ if __name__=='__main__':
     output_filename = sys.argv[1]
     corpus = Corpus(filename=download("reddit-corpus-small"))
 
-    char_list = ['<sos>', '<eos>', '<pad>']
+    char_list = ['<sos>', '<eos>', '<pad>', '<unk>']
     sequences = []
     for convo in corpus.iter_conversations():
         title = convo.meta['title']

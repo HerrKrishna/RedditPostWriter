@@ -21,6 +21,20 @@ def get_batches(directory: str, split: str, batch_size: int):
         yield batch
 
 
+def get_vocab(filename:str) -> list:
+
+    with open(filename, 'r', encoding='utf-8') as f:
+        lines = f.readlines()
+    lines = [line.strip('\n') for line in lines]
+    return lines
+
+
+def write_vocab(filename:str , vocab: list):
+    with open(filename, 'w', encoding='utf-8') as f:
+        for char in vocab:
+            f.write(char + '\n')
+
+
 def get_vocab_size(directory: str) -> int:
 
     with open(directory + '/vocab.txt', 'r', encoding='utf-8') as f:
