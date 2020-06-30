@@ -16,13 +16,14 @@ def generate(model: nn.Module, vocab: list, input_text: str = '',):
 
     last_char = start_sequence[0, -1]
     model.eval()
-    while int(last_char) != 1:
-
+    seq_len = start_sequence.size()[1]
+    while int(last_char) != 1 and seq_len < 300:
         model_out = model(start_sequence)
         model_out = F.log_softmax(model_out, -1)
         model_out = torch.argmax(model_out, -1)
-        last_char = model_out[0, -1]
+        last_char = model_out[:, -1][None, :]
         start_sequence = torch.cat((start_sequence, last_char), -1)
+        seq_len = start_sequence.size()[1]
 
     output_text = id2text(start_sequence.squeeze().tolist(), vocab)
 
@@ -43,8 +44,9 @@ if __name__=='__main__':
     model = Model(vocab_size=vocab_size, **config['model'])
     print('Your input was: ' + input_text)
     print('\n')
-    model = Model()
+
     vocab = get_vocab(model_path + '/vocab.txt')
     output_text = generate(model=model, vocab=vocab, input_text=input_text)
+
     print('Output: ')
     print(output_text)
