@@ -16,7 +16,8 @@ if __name__=='__main__':
         if text == '' or text == '[deleted]' or text == '[removed]':
             continue
         else:
-            post = title + '\n' + text
+            post = title + '\t' + text
+            post = post.replace('\n', '').lower()
             sequence = ''
             for character in post:
                 if character in char_list:

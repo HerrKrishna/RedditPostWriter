@@ -45,8 +45,10 @@ if __name__ == '__main__':
 
     directory = sys.argv[1]
     split = sys.argv[2]
+    vocab = get_vocab(directory+ 'vocab.txt')
+    print(vocab)
     for batch in get_batches(directory, split, 1, max_len=1000):
         ids = batch[0]
-        text = convertTextIds.id2text(ids, vocab=get_vocab(directory+ 'vocab.txt'))
+        text = convertTextIds.id2text(ids, vocab=vocab)
         print(text)
         print('.............................................................................\n')
