@@ -1,7 +1,7 @@
 import sys
 import itertools
 import numpy as np
-
+from preprocessing import convertTextIds
 
 def get_batches(directory: str, split: str, batch_size: int, max_len: int):
 
@@ -40,3 +40,13 @@ def get_vocab_size(directory: str) -> int:
     with open(directory + '/vocab.txt', 'r', encoding='utf-8') as f:
         lines = f.readlines()
     return len(lines)
+
+if __name__ == '__main__':
+
+    directory = sys.argv[1]
+    split = sys.argv[2]
+    for batch in get_batches(directory, split, 1, max_len=1000):
+        ids = batch[0]
+        text = convertTextIds.id2text(ids, vocab=get_vocab(directory+ 'vocab.txt'))
+        print(text)
+        print('.............................................................................\n')
