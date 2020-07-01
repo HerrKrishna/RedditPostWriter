@@ -17,13 +17,15 @@ def generate(model: nn.Module, vocab: list, input_text: str = '', max_len: int =
     last_char = start_sequence[0, -1]
     model.eval()
     seq_len = start_sequence.size()[1]
-    while int(last_char) != 1 and seq_len < max_len:
+    while int(last_char) != 1 and seq_len < 300:
         model_out = model(start_sequence)
         model_out = F.log_softmax(model_out, -1)
         model_out = torch.argmax(model_out, -1)
         last_char = model_out[:, -1][None, :]
         start_sequence = torch.cat((start_sequence, last_char), -1)
         seq_len = start_sequence.size()[1]
+        if seq_len % 100 == 0:
+            print(seq_len)
 
     output_text = id2text(start_sequence.squeeze().tolist(), vocab)
 

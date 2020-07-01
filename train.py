@@ -63,7 +63,11 @@ def train(model: nn.Module,
 
                 average_val_loss = total_val_loss/count
                 print("Average val loss: {}: {:.2f}".format(batch_no, average_val_loss))
-                if average_val_loss < best_checkpoint or best_checkpoint is None:
+                if best_checkpoint is None:
+                    print('New best checkpoint. Saving ...')
+                    torch.save(model.state_dict(), savePath + '/model_state_dict')
+
+                elif average_val_loss < best_checkpoint:
                     best_checkpoint = average_val_loss
                     print('New best checkpoint. Saving ...')
                     torch.save(model.state_dict(), savePath + '/model_state_dict')
