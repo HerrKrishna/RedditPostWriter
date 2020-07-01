@@ -14,6 +14,7 @@ def init_weights(m):
 
 def train(model: nn.Module,
           data_dir: str,
+          savePath: str,
           learning_rate: float,
           batch_size: int = 10,
           num_epochs: int = 10,
@@ -26,6 +27,7 @@ def train(model: nn.Module,
     cross_entropy = nn.CrossEntropyLoss()
     optimizer = torch.optim.SGD(model.parameters(), lr=learning_rate)
     batch_no = 0
+    best_checkpoint = None
     for epoch in range(num_epochs):
         for batch in dataset_reader.get_batches(data_dir, 'train', batch_size, max_len):
             batch_input = torch.tensor(batch[:, :-1])
@@ -61,10 +63,14 @@ def train(model: nn.Module,
 
                 average_val_loss = total_val_loss/count
                 print("Average val loss: {}: {:.2f}".format(batch_no, average_val_loss))
+                if average_val_loss < best_checkpoint or best_checkpoint is None:
+                    best_checkpoint = average_val_loss
+                    print('New best checkpoint. Saving ...')
+                    torch.save(model.state_dict(), savePath + '/model_state_dict')
+
                 model.train()
 
             batch_no += 1
-
 
 if __name__=='__main__':
 
@@ -75,12 +81,11 @@ if __name__=='__main__':
     data_dir = config['storage']['data_dir']
     savePath = config['storage']['savePath']
     vocab_size = dataset_reader.get_vocab_size(data_dir)
-    model = Model(vocab_size=vocab_size, **config['model'])
-    train(model=model, **config['training'])
-
-    torch.save(model.state_dict(), savePath + '/model_state_dict')
     vocab = dataset_reader.get_vocab(data_dir + '/vocab.txt')
     dataset_reader.write_vocab(savePath + '/vocab.txt', vocab=vocab)
 
     with open(savePath + '/config.yaml', 'w') as f:
         yaml.dump(config, f)
+
+    model = Model(vocab_size=vocab_size, **config['model'])
+    train(model=model, **config['training'])
