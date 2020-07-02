@@ -78,6 +78,17 @@ def train(model: nn.Module,
 
 if __name__=='__main__':
 
+    # If there's a GPU available...
+    if torch.cuda.is_available():
+        # Tell PyTorch to use the GPU.
+        device = torch.device("cuda")
+        print('There are %d GPU(s) available.' % torch.cuda.device_count())
+        print('We will use the GPU:', torch.cuda.get_device_name(0))
+    # If not...
+    else:
+        print('No GPU available, using the CPU instead.')
+        device = torch.device("cpu")
+
     config_path = sys.argv[1]
     with open(config_path) as config_file:
         config = yaml.load(config_file, Loader=yaml.FullLoader)
@@ -91,5 +102,6 @@ if __name__=='__main__':
     with open(savePath + '/config.yaml', 'w') as f:
         yaml.dump(config, f)
 
-    model = Model(vocab_size=vocab_size, **config['model'])
+    model = Model(device=device, vocab_size=vocab_size, **config['model'])
+    model.to(device=device)
     train(model=model, **config['training'])

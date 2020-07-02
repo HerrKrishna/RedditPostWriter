@@ -38,18 +38,29 @@ if __name__=='__main__':
     print('Welcome to RedditPostWriter')
     print('####################################')
     print('\n\n')
+
+    # If there's a GPU available...
+    if torch.cuda.is_available():
+        # Tell PyTorch to use the GPU.
+        device = torch.device("cuda")
+        print('There are %d GPU(s) available.' % torch.cuda.device_count())
+        print('We will use the GPU:', torch.cuda.get_device_name(0))
+    # If not...
+    else:
+        print('No GPU available, using the CPU instead.')
+        device = torch.device("cpu")
+
     model_path = sys.argv[1]
     with open(model_path + '/config.yaml' ) as config_file:
         config = yaml.load(config_file, Loader=yaml.FullLoader)
     input_text = sys.argv[2]
     vocab_size = get_vocab_size(model_path)
-    model = Model(vocab_size=vocab_size, **config['model'])
+    model = Model(device=device, vocab_size=vocab_size, **config['model'])
     print('Your input was: ' + input_text)
     print('\n')
 
     vocab = get_vocab(model_path + '/vocab.txt')
     max_len = config['training']['max_len']
     output_text = generate(model=model, vocab=vocab, input_text=input_text, max_len=max_len)
-
     print('Output: ')
     print(output_text)
