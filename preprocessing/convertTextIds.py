@@ -4,7 +4,7 @@ def text2id(text: str, vocab: list, add_bos: bool = False, add_eos: bool = False
         try:
             sequence.append(vocab.index(character))
         except ValueError:
-            sequence.append(vocab(3))
+            sequence.append(vocab[3])
 
     if add_bos:
         sequence = [0] + sequence
