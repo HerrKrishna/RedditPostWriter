@@ -21,7 +21,8 @@ def train(model: nn.Module,
           val_freq: int = 100,
           summary_freq: int = 10,
           max_len: int = 1500):
-
+    
+    device = model.device
     model.apply(init_weights)
     model.train()
     cross_entropy = nn.CrossEntropyLoss()
@@ -36,10 +37,13 @@ def train(model: nn.Module,
             seq_len = logits.size()[1]
             logits = logits.view(batch_size * seq_len, vocab_size)
             batch_labels = batch_labels.flatten()
+            batch_labels = batch_labels.to(device)
             loss = cross_entropy(logits, batch_labels)
             optimizer.zero_grad()
             loss.backward()
             optimizer.step()
+            
+
 
             if batch_no % summary_freq == 0:
                 total_count = batch_no*batch_size
@@ -57,6 +61,7 @@ def train(model: nn.Module,
                     seq_len = val_logits.size()[1]
                     val_logits = val_logits.view(batch_size * seq_len, vocab_size)
                     val_batch_labels = val_batch_labels.flatten()
+                    val_batch_labels = val_batch_labels.to(device)
                     val_loss = cross_entropy(val_logits, val_batch_labels)
                     total_val_loss += val_loss
                     count += 1

@@ -1,4 +1,5 @@
 import torch
+import math
 from torch import nn
 from torch import Tensor
 
@@ -26,7 +27,7 @@ class Model(nn.Module):
 
         input = input.to(self.device)
         embeddings = self.embed(input)
-        attention_out = self.self_attention(embeddings)
+        attention_out = self.self_attention(embeddings, embeddings, embeddings)
         lstm_out, _ = self.lstm(attention_out)
         output = self.hidden2vocab(lstm_out)
         return output
