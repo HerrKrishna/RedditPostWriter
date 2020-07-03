@@ -5,6 +5,7 @@ storage:
   savePath: models/relationship_advice
 model:
   hidden_size: 300
+  n_heads: 5
   dropout: 0.1
 training:
   data_dir: data/relationship_advice

@@ -6,6 +6,7 @@ storage:
 model:
   hidden_size: 300
   dropout: 0.1
+  n_heads: 5
 training:
   data_dir: data/reddit-small
   savePath: models/reddit-small
