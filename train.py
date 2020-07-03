@@ -31,16 +31,18 @@ def train(model: nn.Module,
     for epoch in range(num_epochs):
         for batch in dataset_reader.get_batches(data_dir, 'train', batch_size, max_len):
             batch_input = torch.tensor(batch[:, :-1])
-            batch_labels = torch.tensor(batch[:, 1:])
             logits = model(batch_input)
+            del batch_input
             seq_len = logits.size()[1]
             logits = logits.view(batch_size * seq_len, vocab_size)
+            batch_labels = torch.tensor(batch[:, 1:])
             batch_labels = batch_labels.flatten()
             loss = cross_entropy(logits, batch_labels)
             optimizer.zero_grad()
             loss.backward()
             optimizer.step()
-
+            del batch_labels
+            del logits
             if batch_no % summary_freq == 0:
                 total_count = batch_no*batch_size
                 print("Epoch: {}\tStep: {}\tExamples Seen: {}\tLoss: {} ".format(epoch, batch_no, total_count, loss))
@@ -52,13 +54,16 @@ def train(model: nn.Module,
                 print('Validation:')
                 for val_batch in dataset_reader.get_batches(data_dir, 'dev', batch_size, max_len):
                     val_batch_input = torch.tensor(val_batch[:, :-1])
-                    val_batch_labels = torch.tensor(val_batch[:, 1:])
                     val_logits = model(val_batch_input)
+                    del val_batch_input
                     seq_len = val_logits.size()[1]
                     val_logits = val_logits.view(batch_size * seq_len, vocab_size)
+                    val_batch_labels = torch.tensor(val_batch[:, 1:])
                     val_batch_labels = val_batch_labels.flatten()
                     val_loss = cross_entropy(val_logits, val_batch_labels)
                     total_val_loss += val_loss
+                    del val_logits
+                    del val_batch_labels
                     count += 1
 
                 average_val_loss = total_val_loss/count
