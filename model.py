@@ -15,7 +15,7 @@ class Model(nn.Module):
         self.embed = nn.Embedding(vocab_size, hidden_size)
         self.lstm = nn.LSTM(input_size=hidden_size,
                             hidden_size=hidden_size,
-                            num_layers=2,
+                            num_layers=4,
                             dropout=dropout,
                             batch_first=True)
         self.hidden2vocab = nn.Linear(hidden_size, vocab_size)
