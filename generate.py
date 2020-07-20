@@ -6,7 +6,7 @@ from torch.nn import functional as F
 from model import Model
 from preprocessing.convertTextIds import text2id, id2text
 from dataset_reader import get_vocab_size, get_vocab
-
+import numpy as np
 
 def generate(model: nn.Module, vocab: list, input_text: str = '', max_len: int = 1500):
 
@@ -20,8 +20,9 @@ def generate(model: nn.Module, vocab: list, input_text: str = '', max_len: int =
     while int(last_char) != 1 and seq_len < 300:
         model_out = model(start_sequence)
         model_out = F.log_softmax(model_out, -1)
-        model_out = torch.argmax(model_out, -1)
-        last_char = model_out[:, -1][None, :]
+        model_out = model_out.detach().numpy()[0, -1, :]
+        sample = np.random.choice(len(vocab), p=np.exp(model_out))
+        last_char = torch.tensor(sample).unsqueeze(0).unsqueeze(0)
         start_sequence = torch.cat((start_sequence, last_char), -1)
         seq_len = start_sequence.size()[1]
         if seq_len % 100 == 0:
@@ -56,6 +57,7 @@ if __name__=='__main__':
     input_text = sys.argv[2]
     vocab_size = get_vocab_size(model_path)
     model = Model(device=device, vocab_size=vocab_size, **config['model'])
+    model.load_state_dict(torch.load(model_path + '/model_state_dict', map_location=torch.device('cpu')))
     print('Your input was: ' + input_text)
     print('\n')
 

@@ -48,32 +48,34 @@ def train(model: nn.Module,
             if batch_no % summary_freq == 0:
                 total_count = batch_no*batch_size
                 print("Epoch: {}\tStep: {}\tExamples Seen: {}\tLoss: {} ".format(epoch, batch_no, total_count, loss))
-
+            del loss
             if batch_no % val_freq == 0 and batch_no != 0:
-                model.eval()
-                total_val_loss = 0
-                count = 0
-                print('Validation:')
-                for val_batch in dataset_reader.get_batches(data_dir, 'dev', batch_size, max_len):
-                    val_batch_input = torch.tensor(val_batch[:, :-1])
-                    val_logits = model(val_batch_input)
-                    del val_batch_input
-                    seq_len = val_logits.size()[1]
-                    val_logits = val_logits.view(batch_size * seq_len, vocab_size)
-                    val_batch_labels = torch.tensor(val_batch[:, 1:])
-                    val_batch_labels = val_batch_labels.flatten()
-                    val_batch_labels = val_batch_labels.to(device)
-                    val_loss = cross_entropy(val_logits, val_batch_labels)
-                    total_val_loss += val_loss
-                    del val_logits
-                    del val_batch_labels
-                    count += 1
+                with torch.no_grad():
+                    model.eval()
+                    total_val_loss = 0
+                    count = 0
+                    print('Validation:')
+                    for val_batch in dataset_reader.get_batches(data_dir, 'dev', batch_size, max_len):
+                        val_batch_input = torch.tensor(val_batch[:, :-1])
+                        val_logits = model(val_batch_input)
+                        del val_batch_input
+                        seq_len = val_logits.size()[1]
+                        val_logits = val_logits.view(batch_size * seq_len, vocab_size)
+                        val_batch_labels = torch.tensor(val_batch[:, 1:])
+                        val_batch_labels = val_batch_labels.flatten()
+                        val_batch_labels = val_batch_labels.to(device)
+                        val_loss = cross_entropy(val_logits, val_batch_labels)
+                        total_val_loss += val_loss
+                        del val_logits
+                        del val_batch_labels
+                        count += 1
 
                 average_val_loss = total_val_loss/count
                 print("Average val loss: {}: {:.2f}".format(batch_no, average_val_loss))
                 if best_checkpoint is None:
                     print('New best checkpoint. Saving ...')
                     torch.save(model.state_dict(), savePath + '/model_state_dict')
+                    best_checkpoint = average_val_loss 
 
                 elif average_val_loss < best_checkpoint:
                     best_checkpoint = average_val_loss

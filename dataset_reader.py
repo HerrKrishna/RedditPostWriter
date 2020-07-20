@@ -3,22 +3,30 @@ import itertools
 import numpy as np
 from preprocessing import convertTextIds
 
-def get_batches(directory: str, split: str, batch_size: int, max_len: int):
+def get_batches(directory: str, split: str, batch_size: int, max_len: int, pseudo: bool = False):
+    
+    if not pseudo:
+        with open(directory + '/' + split + '.txt', 'r', encoding='utf-8') as f:
+            lines = f.readlines()
 
-    with open(directory + '/' + split + '.txt', 'r', encoding='utf-8') as f:
-        lines = f.readlines()
+        sequences = [['0'] + line.strip('\n').split(' ') + ['1'] for line in lines]
+        sequences = [[int(character) for character in sequence] for sequence in sequences]
+        sequences = [seq for seq in sequences if len(seq) < max_len]
 
-    sequences = [['0'] + line.strip('\n').split(' ') + ['1'] for line in lines]
-    sequences = [[int(character) for character in sequence] for sequence in sequences]
-    sequences = [seq for seq in sequences if len(seq) < max_len]
+        for i in range(0, len(sequences), batch_size):
+            batch = sequences[i:i + batch_size]
+            if len(batch) < batch_size:
+                break
+            #this converts batch to a np.array padded with zeros
+            batch = np.array(list(itertools.zip_longest(*batch, fillvalue=2))).T
+            yield batch
 
-    for i in range(0, len(sequences), batch_size):
-        batch = sequences[i:i + batch_size]
-        if len(batch) < batch_size:
-            break
-        #this converts batch to a np.array padded with zeros
-        batch = np.array(list(itertools.zip_longest(*batch, fillvalue=2))).T
-        yield batch
+    else:
+        for i in range(0, 500):
+            batch = [[0] +[i for i in range(4, 20)]+ [1] for x in range(batch_size)]
+            #print(batch)
+            batch = np.array(batch)
+            yield batch
 
 
 def get_vocab(filename:str) -> list:

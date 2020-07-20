@@ -2,17 +2,17 @@
 
 storage:
   data_dir: data/relationship_advice
-  savePath: models/relationship_advice
+  savePath: models/pseudo
 model:
   hidden_size: 300
   n_heads: 5
   dropout: 0.1
 training:
   data_dir: data/relationship_advice
-  savePath: models/relationship_advice
+  savePath: models/pseudo
   learning_rate: 0.1
-  val_freq: 3000
+  val_freq: 1000
   summary_freq: 100
-  batch_size: 10
+  batch_size: 100
   num_epochs: 100
   max_len: 300
