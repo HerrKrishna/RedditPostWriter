@@ -20,7 +20,7 @@ def generate(model: nn.Module, vocab: list, input_text: str = '', max_len: int =
     while int(last_char) != 1 and seq_len < max_len:
         model_out = model(start_sequence)
         model_out = F.log_softmax(model_out, -1)
-        model_out = model_out.detach().numpy()[0, -1, :]
+        model_out = model_out.detach().cpu().numpy()[0, -1, :]
         sample = np.random.choice(len(vocab), p=np.exp(model_out))
         last_char = torch.tensor(sample).unsqueeze(0).unsqueeze(0)
         start_sequence = torch.cat((start_sequence, last_char), -1)

@@ -92,6 +92,7 @@ def train(model: nn.Module,
         print(generate.generate(model=model, vocab=vocab, input_text=''))
         print('----------------------------------------------------------------------------------------')
         print('')
+        model.train()
 
 if __name__=='__main__':
 
