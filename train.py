@@ -4,6 +4,7 @@ import yaml
 from torch import nn
 import dataset_reader
 from model import Model
+import generate
 
 
 def init_weights(m):
@@ -85,6 +86,12 @@ def train(model: nn.Module,
                 model.train()
 
             batch_no += 1
+        print('')
+        print('---------------------------------------------------------------------------------------')
+        print('Epoch over. Generating a sample:')
+        print(generate.generate(model=model, vocab=vocab, input_text=''))
+        print('----------------------------------------------------------------------------------------')
+        print('')
 
 if __name__=='__main__':
 

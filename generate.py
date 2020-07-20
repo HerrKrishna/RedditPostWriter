@@ -8,7 +8,7 @@ from preprocessing.convertTextIds import text2id, id2text
 from dataset_reader import get_vocab_size, get_vocab
 import numpy as np
 
-def generate(model: nn.Module, vocab: list, input_text: str = '', max_len: int = 1500):
+def generate(model: nn.Module, vocab: list, input_text: str = '', max_len: int = 300):
 
     start_sequence = text2id(input_text, vocab, add_bos=True)
     start_sequence = torch.tensor(start_sequence)
@@ -17,7 +17,7 @@ def generate(model: nn.Module, vocab: list, input_text: str = '', max_len: int =
     last_char = start_sequence[0, -1]
     model.eval()
     seq_len = start_sequence.size()[1]
-    while int(last_char) != 1 and seq_len < 300:
+    while int(last_char) != 1 and seq_len < max_len:
         model_out = model(start_sequence)
         model_out = F.log_softmax(model_out, -1)
         model_out = model_out.detach().numpy()[0, -1, :]
