@@ -18,7 +18,7 @@ def generate(model: nn.Module, vocab: list, input_text: str = '', max_len: int =
     model.eval()
     seq_len = start_sequence.size()[1]
     while int(last_char) != 1 and seq_len < max_len:
-        model_out = model(start_sequence)
+        model_out, lstm_out = model(start_sequence)
         model_out = F.log_softmax(model_out, -1)
         model_out = model_out.detach().cpu().numpy()[0, -1, :]
         sample = np.random.choice(len(vocab), p=np.exp(model_out))

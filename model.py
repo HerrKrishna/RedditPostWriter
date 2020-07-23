@@ -33,7 +33,7 @@ class Model(nn.Module):
         #attention_out = self.ReLU(attention_out)
         lstm_out, _ = self.lstm(embeddings)#self.lstm(attention_out)
         output = self.hidden2vocab(lstm_out)
-        return output
+        return output, lstm_out
 
 #i copied this from JoeyNMT
 # pylint: disable=arguments-differ

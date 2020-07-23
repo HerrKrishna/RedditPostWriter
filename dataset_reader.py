@@ -1,6 +1,7 @@
 import sys
 import itertools
 import numpy as np
+import random
 from preprocessing import convertTextIds
 
 def get_batches(directory: str, split: str, batch_size: int, max_len: int, pseudo: bool = False):
@@ -28,6 +29,23 @@ def get_batches(directory: str, split: str, batch_size: int, max_len: int, pseud
             batch = np.array(batch)
             yield batch
 
+def get_random_sequence(directory: str, split: str, max_len: int, pseudo: bool = False):
+    if not pseudo:
+        with open(directory + '/' + split + '.txt', 'r', encoding='utf-8') as f:
+            lines = f.readlines()
+
+        short_lines = []
+        for line in lines:
+            if len(line) < max_len:
+                short_lines.append(line)
+            else:
+                break
+
+        sampled_line = random.sample(short_lines, 1)[0]
+        seq = ['0'] + sampled_line.strip('\n').split(' ') + ['1']
+        seq = [int(character) for character in seq]
+        seq = np.array(seq)
+        return seq
 
 def get_vocab(filename:str) -> list:
 

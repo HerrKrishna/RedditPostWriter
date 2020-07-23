@@ -33,7 +33,7 @@ def train(model: nn.Module,
     for epoch in range(num_epochs):
         for batch in dataset_reader.get_batches(data_dir, 'train', batch_size, max_len):
             batch_input = torch.tensor(batch[:, :-1])
-            logits = model(batch_input)
+            logits, lstm_out = model(batch_input)
             del batch_input
             seq_len = logits.size()[1]
             logits = logits.view(batch_size * seq_len, vocab_size)
@@ -58,7 +58,7 @@ def train(model: nn.Module,
                     print('Validation:')
                     for val_batch in dataset_reader.get_batches(data_dir, 'dev', batch_size, max_len):
                         val_batch_input = torch.tensor(val_batch[:, :-1])
-                        val_logits = model(val_batch_input)
+                        val_logits, lstm_out = model(val_batch_input)
                         del val_batch_input
                         seq_len = val_logits.size()[1]
                         val_logits = val_logits.view(batch_size * seq_len, vocab_size)
